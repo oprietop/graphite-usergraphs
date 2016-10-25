@@ -1,0 +1,134 @@
+---
+path: collectd.windows
+graphname: '~stats'
+regexp: $path\.host_count
+username: windows
+options:
+  target: legendValue(legendValue(legendValue(aliasByNode(transformNull(cactiStyle(lowestCurrent($path.*,99)),0),2),"last"),"max"),"avg")
+  title: 'Collector Stats for $path'
+  vtitle: 'various'
+---
+path: collectd.windows
+graphname: '$1.cpu.average'
+regexp: collectd\.windows\.([^\.]+)\.cpu_all
+username: windows
+options:
+  target: cactiStyle(aliasByNode($path.$1.cpu_all,3))
+  title: 'Average CPU Usage On $1'
+  vtitle: 'percent'
+---
+path: collectd.windows
+graphname: '$1.cpu.stacked'
+regexp: collectd\.windows\.([^\.]+)\.cpu_0
+username: windows
+options:
+  target: legendValue(aliasByNode(stacked(sortByMaxima($path.$1.cpu_[0-9]*)),3),'avg')
+  title: 'Stacked CPU Usage On $1'
+  vtitle: 'percent'
+---
+path: collectd.windows
+graphname: '$1.cpu.combined'
+regexp: collectd\.windows\.([^\.]+)\.cpu_0
+username: windows
+options:
+  target: legendValue(aliasByNode(sortByMinima($path.$1.cpu_[0-9]*),3),'max')
+  title: 'Combined CPU Usage On $1'
+  vtitle: 'percent'
+---
+path: collectd.windows
+graphname: '$1.mem.percent'
+regexp: $path\.([^\.]+)\.disk_physical_memory_percent
+username: windows
+options:
+  target: cactiStyle(aliasByNode($path.$1.disk_physical_memory_percent,3))
+  target1: cactiStyle(aliasByNode($path.$1.disk_virtual_memory_percent,3))
+  title: 'Memory Usage On $1'
+  vtitle: 'percent'
+---
+path: collectd.windows
+graphname: '$1.mem.physical'
+regexp: $path\.([^\.]+)\.disk_physical_memory_used
+username: windows
+options:
+  target: cactiStyle(aliasByNode($path.$1.disk_physical_memory_used,3))
+  target1: cactiStyle(aliasByNode($path.$1.disk_physical_memory_size,3))
+  title: 'Physical Memmory Usage On $1'
+  vtitle: 'bytes'
+---
+path: collectd.windows
+graphname: '$1.mem.virtual'
+regexp: $path\.([^\.]+)\.disk_physical_memory_used
+username: windows
+options:
+  target: cactiStyle(aliasByNode($path.$1.disk_virtual_memory_used,3))
+  target1: cactiStyle(aliasByNode($path.$1.disk_virtual_memory_size,3))
+  title: 'Virtual Memmory Usage On $1'
+  vtitle: 'bytes'
+---
+path: collectd.windows
+graphname: '$1.net.$2.bits'
+regexp: $path\.([^\.]+)\.(nic\d+\_[\d\-]+)_ifentryinoctets
+username: windows
+options:
+  target: aliasByNode(scaleToSeconds(nonNegativeDerivative($path.$1.$2_ifentryinoctets),8),3)
+  target1: aliasByNode(scaleToSeconds(nonNegativeDerivative($path.$1.$2_ifentryoutoctets),-8),3)
+  title: 'Network Usage On $1'
+  vtitle: 'tx / rx (bps)'
+---
+path: collectd.windows
+graphname: '$1.net.$2.errors'
+regexp: $path\.([^\.]+)\.(nic\d+\_[\d\-]+)_ifentryinerrors
+username: windows
+options:
+  target: aliasByNode(scaleToSeconds(nonNegativeDerivative($path.$1.$2_ifentryinerrors),1),3)
+  target1: aliasByNode(scaleToSeconds(nonNegativeDerivative($path.$1.$2_ifentryouterrors),-1),3)
+  title: 'Errors On $1'
+  vtitle: 'errors'
+---
+path: collectd.windows
+graphname: '$1.net.$2.discards'
+regexp: $path\.([^\.]+)\.(nic\d+\_[\d\-]+)_ifentryindiscards
+username: windows
+options:
+  target: aliasByNode(scaleToSeconds(nonNegativeDerivative($path.$1.$2_ifentryindiscards),1),3)
+  target1: aliasByNode(scaleToSeconds(nonNegativeDerivative($path.$1.$2_ifentryoutdiscards),-1),3)
+  title: 'Discards On $1'
+  vtitle: 'discards'
+---
+path: collectd.windows
+graphname: '$1.disk.$2.percent'
+regexp: $path\.([^\.]+)\.(disk_\w_[\w_]+)_percent
+username: windows
+options:
+  target: cactiStyle(aliasByNode($path.$1.$2_percent,3))
+  title: 'Percent Disk Usage on $2'
+  vtitle: 'percent'
+---
+path: collectd.windows
+graphname: '$1.disk.$2.bytes'
+regexp: $path\.([^\.]+)\.(disk_\w_[\w_]+)_size
+username: windows
+options:
+  target: cactiStyle(aliasByNode($path.$1.$2_used,3))
+  target1: cactiStyle(aliasByNode($path.$1.$2_size,3))
+  title: 'Disk Usage on $2'
+  vtitle: 'bytes'
+---
+path: collectd.windows
+graphname: '$1.~citrix_sessions'
+regexp: $path\.([^\.]+)\.citrix_sessions
+username: windows
+options:
+  target: cactiStyle(aliasByNode($path.$1.citrix_sessions,3))
+  title: 'Citrix Sessions On $1'
+  vtitle: 'sessions'
+---
+path: collectd.windows
+graphname: '$1.~processes'
+regexp: $path\.([^\.]+)\.system_processes
+username: windows
+options:
+  target: cactiStyle(aliasByNode($path.$1.system_processes,3))
+  title: 'Total Running Processes On $1'
+  vtitle: 'processes'
+

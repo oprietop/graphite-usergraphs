@@ -1,0 +1,92 @@
+---
+path: torrente.xen
+graphname: '~stats'
+regexp: $path\.host_count
+username: xen
+options:
+  target: legendValue(legendValue(legendValue(aliasByNode(lowestCurrent($path.*,99),2),"last"),"max"),"avg")
+  title: 'Collector Stats for $path'
+  vtitle: 'various'
+  yMin: '0'
+---
+path: torrente.xen.vms
+graphname: '$1.$2.cpu.average'
+regexp: $path\.([^\.]+)\.([^\.]+)\.cpu0
+username: xen
+options:
+  target: cactiStyle(alias(averageSeries(asPercent($path.$1.$2.cpu*,1)),'averagecpu'))
+  yMax: '100'
+  title: 'Average CPU Usage On $2'
+  vtitle: 'percent'
+---
+path: torrente.xen.vms
+graphname: '$1.~top5_cpu'
+regexp: $path\.([^\.]+)\.[^\.]+\.cpu0
+username: xen
+options:
+  target: legendValue(aliasByNode(lowestCurrent(highestAverage(asPercent(averageSeriesWithWildcards($path.$1.*.cpu*,5),1),5),5),4),'avg')
+  yMax: '100'
+  title: 'Average CPU Usage On $1'
+  vtitle: 'percent'
+---
+path: torrente.xen.vms
+graphname: '$1.$2.cpu.stacked'
+regexp: $path\.([^\.]+)\.([^\.]+)\.cpu0
+username: xen
+options:
+  target: cactiStyle(aliasByNode(stacked(sortByMinima(groupByNode(transformNull(asPercent($path.$1.$2.cpu*,1),0),5,'sumSeries'))),0))
+  target1: alias(dashed(sumSeries(offset(scale($path.$1.$2.cpu*,0),100))),'')
+  yStep: '100'
+  title: 'Stacked CPU Usage On $2'
+  vtitle: 'percent'
+---
+path: torrente.xen.vms
+graphname: '$1.$2.cpu.combined'
+regexp: $path\.([^\.]+)\.([^\.]+)\.cpu0
+username: xen
+options:
+  target: cactiStyle(aliasByNode(sortByMinima(groupByNode(transformNull(asPercent($path.$1.$2.cpu*,1),0),5,'sumSeries')),0))
+  yMax: '100'
+  title: 'Combined CPU Usage On $2'
+  vtitle: 'percent'
+---
+path: torrente.xen.vms
+graphname: '$1.$2.mem.memory'
+regexp: $path\.([^\.]+)\.([^\.]+)\.memory
+username: xen
+options:
+  target: cactiStyle(aliasByNode(scale($path.$1.$2.memory_internal_free,0.0009765625),5))
+  target1: cactiStyle(aliasByNode(scale($path.$1.$2.memory,0.00000095367431640625),5))
+  target2: cactiStyle(aliasByNode(scale($path.$1.$2.memory_target,0.00000095367431640625),5))
+  title: 'Memory Usage On $2'
+  vtitle: 'MB'
+---
+path: torrente.xen.vms
+graphname: '$1.$2.net.$3.bits'
+regexp: $path\.([^\.]+)\.([^\.]+)\.([pv]if[^\.]+)_tx
+username: xen
+options:
+  target: cactiStyle(aliasByNode(scale($path.$1.$2.$3_rx,8),5))
+  target1: cactiStyle(aliasByNode(scale($path.$1.$2.$3_tx,-8),5))
+  title: 'Network usage Usage On $2 For $3'
+  vtitle: 'tx / rx (bps)'
+---
+path: torrente.xen.vms
+graphname: '$1.~top5_net_bits'
+regexp: $path\.([^\.]+)\.[^\.]+\.[pv]if[^\.]+_tx
+username: xen
+options:
+  target: legendValue(aliasByNode(scale(highestCurrent($path.$1.*.vif_*_rx,5),8),4,5),"last")
+  target1: legendValue(aliasByNode(scale(lowestCurrent(highestCurrent($path.$1.*.vif_*_tx,5),5),-8),4,5),"last")
+  title: 'Top 10 Network usage Usage On $1'
+  vtitle: 'tx / rx (bps)'
+---
+path: torrente.xen.vms
+graphname: '$1.$2.io.$3'
+regexp: $path\.([^\.]+)\.([^\.]+)\.([^\.]+)_read
+username: xen
+options:
+  target: cactiStyle(aliasByNode(scale($path.$1.$2.$3_read,0.00000095367431640625),5))
+  target1: cactiStyle(aliasByNode(scale($path.$1.$2.$3_write,-0.00000095367431640625),5))
+  title: 'Disk I/O On $2 For $3'
+  vtitle: 'write / read (MBps)'

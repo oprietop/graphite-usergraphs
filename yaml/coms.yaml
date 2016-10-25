@@ -1,0 +1,98 @@
+---
+path: torrente.coms
+graphname: '~stats'
+regexp: $path\.host_count
+username: coms
+options:
+  target: legendValue(legendValue(legendValue(aliasByNode(transformNull(cactiStyle(lowestCurrent($path.*,99)),0),2),"last"),"max"),"avg")
+  title: 'Collector Stats for $path'
+  vtitle: 'various'
+  yMin: '0'
+---
+path: torrente.coms
+graphname: '$1.$2.$3.~bits'
+regexp: $path\.([^"\.]+)\.([^"\.]+)\.([^"\.]+)\.interfaces
+username: coms
+options:
+  target: legendValue(aliasSub(aliasByNode(scaleToSeconds(lowestCurrent(maximumAbove(nonNegativeDerivative(torrente.coms.$1.$2.$3.interfaces.*.*.bytes_in),10000),99),8),6,7,8),'\.',' | '),'last')
+  target1: legendValue(aliasSub(aliasByNode(scaleToSeconds(lowestCurrent(maximumAbove(nonNegativeDerivative(torrente.coms.$1.$2.$3.interfaces.*.*.bytes_out),10000),99),-8),6,7,8),'\.',' | '),'last') 
+  title: 'Interface Network Traffic on $3'
+  vtitle: 'out / in (bps)'
+---
+path: torrente.coms
+graphname: '$1.$2.$3.~bits_highest_max'
+regexp: $path\.([^"\.]+)\.([^"\.]+)\.([^"\.]+)\.interfaces
+username: coms
+options:
+  target: legendValue(aliasSub(aliasByNode(sortByMaxima(scaleToSeconds(highestMax(maximumAbove(nonNegativeDerivative($path.$1.$2.$3.interfaces.*.*.bytes_in),10000),1),8)),6,7,8),'\.',' | '),'last')
+  target1: legendValue(aliasSub(aliasByNode(sortByMaxima(scaleToSeconds(highestMax(maximumAbove(nonNegativeDerivative($path.$1.$2.$3.interfaces.*.*.bytes_out),10000),1),-8)),6,7,8),'\.',' | '),'last') 
+  title: 'Highest Maximun Interface Network Traffic on $3'
+  vtitle: 'out / in (bps)'
+---
+path: torrente.coms
+graphname: '$1.$2.$3.~bits_highest_average'
+regexp: $path\.([^"\.]+)\.([^"\.]+)\.([^"\.]+)\.interfaces
+username: coms
+options:
+  target: legendValue(aliasSub(aliasByNode(sortByMaxima(scaleToSeconds(highestAverage(maximumAbove(nonNegativeDerivative($path.$1.$2.$3.interfaces.*.*.bytes_in),10000),1),8)),6,7,8),'\.',' | '),'last')
+  target1: legendValue(aliasSub(aliasByNode(sortByMaxima(scaleToSeconds(highestAverage(maximumAbove(nonNegativeDerivative($path.$1.$2.$3.interfaces.*.*.bytes_out),10000),1),-8)),6,7,8),'\.',' | '),'last') 
+  title: 'Highest Average Interface Network Traffic on $3'
+  vtitle: 'out / in (bps)'
+---
+path: torrente.coms
+graphname: '$1.$2.$3.~bits_highest_current'
+regexp: $path\.([^"\.]+)\.([^"\.]+)\.([^"\.]+)\.interfaces
+username: coms
+options:
+  target: legendValue(aliasSub(aliasByNode(sortByMaxima(scaleToSeconds(highestCurrent(maximumAbove(nonNegativeDerivative($path.$1.$2.$3.interfaces.*.*.bytes_in),10000),1),8)),6,7,8),'\.',' | '),'last')
+  target1: legendValue(aliasSub(aliasByNode(sortByMaxima(scaleToSeconds(highestCurrent(maximumAbove(nonNegativeDerivative($path.$1.$2.$3.interfaces.*.*.bytes_out),10000),1),-8)),6,7,8),'\.',' | '),'last') 
+  title: 'Highest Current Interface Network Traffic on $3'
+  vtitle: 'out / in (bps)'
+---
+path: torrente.coms
+graphname: '$1.$2.$3.~bits_most_deviant'
+regexp: $path\.([^"\.]+)\.([^"\.]+)\.([^"\.]+)\.interfaces
+username: coms
+options:
+  target: legendValue(aliasSub(aliasByNode(sortByMaxima(scaleToSeconds(highestCurrent(maximumAbove(nonNegativeDerivative($path.$1.$2.$3.interfaces.*.*.bytes_in),10000),1),8)),6,7,8),'\.',' | '),'last')
+  target1: legendValue(aliasSub(aliasByNode(sortByMaxima(scaleToSeconds(highestCurrent(maximumAbove(nonNegativeDerivative($path.$1.$2.$3.interfaces.*.*.bytes_out),10000),1),-8)),6,7,8),'\.',' | '),'last') 
+  title: 'Most Deviant Interface  on $3'
+  vtitle: 'out / in (bps)'
+---
+path: torrente.coms
+graphname: '$1.$2.$3.~errors'
+regexp: $path\.([^"\.]+)\.([^"\.]+)\.([^"\.]+)\.errors
+username: coms
+options:
+  target: legendValue(aliasSub(aliasByNode(sortByMaxima(scaleToSeconds(maximumAbove(nonNegativeDerivative($path.$1.$2.$3.interfaces.*.*.errors_in),1),8)),6,7,8),'\.',' | '),'last')
+  target1: legendValue(aliasSub(aliasByNode(sortByMaxima(scaleToSeconds(maximumAbove(nonNegativeDerivative($path.$1.$2.$3.interfaces.*.*.errors_out),1),-8)),6,7,8),'\.',' | '),'last')
+  title: 'Interface Errors Traffic on $3'
+  vtitle: 'out / in (errors)'
+---
+path: torrente.coms
+graphname: '$1.$2.$3.~drops'
+regexp: $path\.([^"\.]+)\.([^"\.]+)\.([^"\.]+)\.drops
+username: coms
+options:
+  target: legendValue(aliasSub(aliasByNode(sortByMaxima(scaleToSeconds(maximumAbove(nonNegativeDerivative($path.$1.$2.$3.interfaces.*.*.drops_in),1),8)),6,7,8),'\.',' | '),'last')
+  target1: legendValue(aliasSub(aliasByNode(sortByMaxima(scaleToSeconds(maximumAbove(nonNegativeDerivative($path.$1.$2.$3.interfaces.*.*.drops_out),1),-8)),6,7,8),'\.',' | '),'last')
+  title: 'Interface Drops Traffic on $3'
+  vtitle: 'out / in (drops)'
+---
+path: torrente.coms
+graphname: '$1.cisco.$2.~cpu'
+regexp: $path\.([^"\.]+)\.cisco\.([^"\.]+)\.interfaces
+username: coms
+options:
+  target: cactiStyle(aliasByNode($path.$1.cisco.$2.system.cpmcputotal5minrev,4,6))
+  title: 'CPU on $2'
+  vtitle: 'percent'
+---
+path: torrente.coms
+graphname: '$1.enterasys.$2.~cpu'
+regexp: $path\.([^"\.]+)\.enterasys\.([^"\.]+)\.interfaces
+username: coms
+options:
+  target: cactiStyle(aliasByNode(scale($path.$1.enterasys.$2.system.etsysresourcecpuload5min,0.1),4,6))
+  title: 'CPU on $2'
+  vtitle: 'percent'

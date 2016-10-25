@@ -1,0 +1,366 @@
+---
+path: tronchon.perl
+graphname: '~stats'
+regexp: $path\.host_count
+username: hosts
+options:
+  target: legendValue(legendValue(legendValue(aliasByNode(transformNull(cactiStyle(lowestCurrent($path.*,99)),0),2),"last"),"max"),"avg")
+  title: 'Collector Stats for $path'
+  vtitle: 'various'
+  yMin: '0'
+---
+path: tronchon.perl
+graphname: '$1.$2.~swap_raw'
+regexp: $path\.([^\.]+)\.([^\.]+)\.swap.ssrawswapin
+username: hosts
+options:
+  target: cactiStyle(alias($path.$1.$2.swap.ssrawswapin,'Swapped IN'))
+  target1: cactiStyle(alias(scale($path.$1.$2.swap.ssrawswapout,-1),'Swapped OUT'))
+  title: 'Blocks swapped on $2'
+  vtitle: 'number of blocks swapped in / out'
+---
+path: tronchon.perl
+graphname: '$1.$2.io.$3.iops'
+regexp: $path\.([^\.]+)\.([^\.]+)\.diskio\.([^\.]+)\.ioreads
+username: hosts
+options:
+  target: legendValue(aliasSub(aliasByNode(scaleToSeconds(nonNegativeDerivative(maximumAbove($path.$1.$2.diskio.$3.ioreads,1)),1),5,6),'.ion', ' '),'last')
+  target1: legendValue(aliasSub(aliasByNode(scaleToSeconds(nonNegativeDerivative(maximumAbove($path.$1.$2.diskio.$3.iowrites,1)),-1),5,6),'.ion', ' '),'last')
+  title: 'Disk I/O on $2'
+  vtitle: 'number'
+---
+path: tronchon.perl
+graphname: '$1.$2.io.~top10_iops'
+regexp: $path\.([^\.]+)\.([^\.]+)\.diskio\.([^\.]+)\.ioreads
+username: hosts
+options:
+  target: legendValue(aliasSub(aliasByNode(scaleToSeconds(nonNegativeDerivative(highestCurrent($path.$1.$2.diskio.*.ioreads,10)),1),5,6),'.ion', ' '),"last")
+  target1: legendValue(aliasSub(aliasByNode(scaleToSeconds(nonNegativeDerivative(highestCurrent($path.$1.$2.diskio.*.iowrites,10)),-1),5,6),'.ion', ' '),"last")
+  title: 'Top 10 Disk I/O on $2'
+  vtitle: 'number'
+---
+path: tronchon.perl
+graphname: '$1.$2.io.$3.bytes'
+regexp: $path\.([^\.]+)\.([^\.]+)\.diskio\.([^\.]+)\.ioread
+username: hosts
+options:
+  target: legendValue(aliasSub(aliasByNode(scaleToSeconds(nonNegativeDerivative(maximumAbove($path.$1.$2.diskio.$3.ionread,1)),1),5,6),'.ion', ' '),'last')
+  target1: legendValue(aliasSub(aliasByNode(scaleToSeconds(nonNegativeDerivative(maximumAbove($path.$1.$2.diskio.$3.ionwritten,1)),-1),5,6),'.ion', ' '),'last')
+  title: 'Disk I/O on $2'
+  vtitle: 'bytes'
+---
+path: tronchon.perl
+graphname: '$1.$2.io.~top10_bytes'
+regexp: $path\.([^\.]+)\.([^\.]+)\.diskio\.([^\.]+)\.ioread
+username: hosts
+options:
+  target: legendValue(aliasSub(aliasByNode(scaleToSeconds(nonNegativeDerivative(highestCurrent($path.$1.$2.diskio.*.ionread,10)),1),5,6),'.ion', ' '),"last")
+  target1: legendValue(aliasSub(aliasByNode(scaleToSeconds(nonNegativeDerivative(highestCurrent($path.$1.$2.diskio.*.ionwritten,10)),-1),5,6),'.ion', ' '),"last")
+  title: 'Top 10 Disk I/O on $2'
+  vtitle: 'bytes'
+---
+path: tronchon.perl
+graphname: '$1.$2.io.$3.total'
+regexp: $path\.([^\.]+)\.([^\.]+)\.diskio\.([^\.]+)\.ionreadx
+username: hosts
+options:
+  target: legendValue(aliasSub(aliasByNode($path.$1.$2.diskio.$3.ionreadx,5,6),'.ion', ' '),'last') 
+  target1: legendValue(aliasSub(aliasByNode(scale($path.$1.$2.diskio.$3.ionwrittenx,-1),5,6),'.ion', ' '),'last')
+  title: 'Bytes moved on $3 since boot'
+  vtitle: 'bytes'
+---
+path: tronchon.perl
+graphname: '$1.$2.io.~top10_total'
+regexp: $path\.([^\.]+)\.([^\.]+)\.diskio\.([^\.]+)\.ionreadx
+username: hosts
+options:
+  target: legendValue(aliasSub(aliasByNode(lowestCurrent(highestMax($path.$1.$2.diskio.*.ionreadx,10),99),5,6),'.ion', ' '),"last")
+  target1: legendValue(aliasSub(aliasByNode(scale(lowestCurrent(highestMax($path.$1.$2.diskio.*.ionwrittenx,10),99),-1),5,6),'.ion', ' '),"last")
+  title: 'Top 10 Disk total bytes moved on $2'
+  vtitle: 'bytes'
+---
+path: tronchon.perl
+graphname: '$1.$2.cpu.average'
+regexp: $path\.([^\.]+)\.([^\.]+)\.cpu.all
+username: hosts
+options:
+  target: cactiStyle(aliasByNode($path.$1.$2.cpu.all,4))
+  title: 'Average CPU Usage On $2'
+  vtitle: 'percent'
+---
+path: tronchon.perl
+graphname: '$1.$2.cpu.stacked'
+regexp: $path\.([^\.]+)\.([^\.]+)\.cpu.0
+username: hosts
+options:
+  target: legendValue(aliasByNode(stacked(sortByMaxima($path.$1.$2.cpu.[0-9]*)),4,5),'avg')
+  title: 'Stacked CPU Usage On $2'
+  vtitle: 'percent'
+---
+path: tronchon.perl
+graphname: '$1.$2.cpu.combined'
+regexp: $path\.([^\.]+)\.([^\.]+)\.cpu.0
+username: hosts
+options:
+  target: legendValue(aliasByNode(lowestCurrent($path.$1.$2.cpu.[0-9]*,99),4,5),'max')
+  title: 'Combined CPU Usage On $2'
+  vtitle: 'percent'
+---
+path: tronchon.perl
+graphname: '$1.$2.disk.$3.$4.percent'
+regexp: $path\.([^\.]+)\.([^\.]+)\.disk\.([^\.]+)\.([^\.]+)\.percent 
+username: hosts
+options:
+  target: cactiStyle(aliasSub(aliasByNode($path.$1.$2.disk.$3.$4.percent,6),'_','/'))
+  title: 'Disk percent on $4'
+  vtitle: 'percent'
+---
+path: tronchon.perl
+graphname: '$1.$2.disk.$3.$4.bytes'
+regexp: $path\.([^\.]+)\.([^\.]+)\.disk\.([^\.]+)\.([^\.]+)\.size 
+username: hosts
+options:
+  target: legendValue(aliasSub(aliasSub(aliasByNode($path.$1.$2.disk.$3.$4.used,6),'_','/'),'$',' Used'),"last")
+  target1: legendValue(aliasSub(aliasSub(aliasByNode(diffSeries($path.$1.$2.disk.$3.$4.size,$path.$1.$2.disk.$3.$4.used),6),'_','/'),'$',' Free'),"last")
+  target2: legendValue(aliasSub(aliasSub(aliasByNode($path.$1.$2.disk.$3.$4.size,6),'_','/'),'$',' Size'),"last")
+  title: '$4 bytes'
+  vtitle: 'bytes'
+  areaMode: 'first'
+---
+path: tronchon.perl
+graphname: '$1.$2.disk.$3.~all_percent'
+regexp: $path\.([^\.]+)\.([^\.]+)\.disk\.([^\.]+)\.[^\.]+\.percent
+username: hosts
+options:
+  target: cactiStyle(aliasSub(aliasByNode(lowestCurrent($path.$1.$2.disk.$3.*.percent,99),6),'_','/'))
+  title: 'Percent disk usage in $3'
+  vtitle: 'percent'
+---
+path: tronchon.perl
+graphname: '$1.$2.disk.$3.~all_bytes'
+regexp: $path\.([^\.]+)\.([^\.]+)\.disk\.([^\.]+)\.[^\.]+\.size
+username: hosts
+options:
+  target: cactiStyle(aliasSub(aliasByNode(lowestCurrent($path.$1.$2.disk.$3.*.size,99),6),'_','/'))
+  title: 'Disk usage in $3'
+  vtitle: 'bytes'
+---
+path: tronchon.perl
+graphname: '$1.$2.net.$3.bits'
+regexp: $path\.([^\.]+)\.([^\.]+)\.net\.(nic\d+\_[\d\-]+).ifentryinoctets
+username: hosts
+options:
+  target: cactiStyle(alias(scaleToSeconds(nonNegativeDerivative($path.$1.$2.net.$3.ifentryinoctets),8),'bits IN'))
+  target1: cactiStyle(alias(scaleToSeconds(nonNegativeDerivative($path.$1.$2.net.$3.ifentryoutoctets),-8),'bits OUT'))
+  title: 'Network Usage On $3'
+  vtitle: 'tx / rx (bps)'
+---
+path: tronchon.perl
+graphname: '$1.$2.~cpu_raw'
+regexp: $path\.([^\.]+)\.([^\.]+)\.cpuraw.sscpurawidle
+username: hosts
+options:
+  target: cactiStyle(aliasSub(aliasByNode(asPercent(nonNegativeDerivative(lowestCurrent($path.$1.$2.cpuraw.*,9))),5),'sscpuraw',''))
+  title: 'Raw CPU Usage On $2'
+  vtitle: 'percent'
+---
+path: tronchon.perl
+graphname: '$1.$2.~mem_raw'
+regexp: $path\.([^\.]+)\.([^\.]+)\.mem.memtotalreal
+username: hosts
+options:
+  target: legendValue(alias(scale(diffSeries($path.$1.$2.mem.memtotalreal,$path.$1.$2.mem.memavailreal,$path.$1.$2.mem.shared,$path.$1.$2.mem.membuffer,$path.$1.$2.mem.memcached),1024),'used'),'last')
+  target1: legendValue(aliasSub(aliasSub(aliasByNode(scale(exclude($path.$1.$2.mem.*,'swap|totalreal|totalfree'),1024),5),'mem',''),'real',''),'last') 
+  title: 'Raw Memory usage On $2'
+  vtitle: 'bytes'
+  areaMode: 'stacked'
+---
+path: tronchon.perl
+graphname: '$1.$2.~interrupts'
+regexp: $path\.([^\.]+)\.([^\.]+)\.int.ssrawinterrupts
+username: hosts
+options:
+  target: cactiStyle(aliasSub(aliasByNode(lowestCurrent(nonNegativeDerivative($path.$1.$2.int.ssraw*),9),5),'ssraw',''))
+  title: 'Interrupts On $2'
+  vtitle: 'number'
+---
+path: tronchon.perl
+graphname: '$1.$2.~tcp_stats'
+regexp: $path\.([^\.]+)\.([^\.]+)\.tcp.tcpinsegs
+username: hosts
+options:
+  target: legendValue(aliasSub(aliasByNode(lowestCurrent(nonNegativeDerivative($path.$1.$2.tcp.*),99),5),'tcp',''),'last')
+  title: 'TCP Stats on $2'
+  vtitle: 'number'
+---
+path: tronchon.perl
+graphname: '$1.$2.~udp_stats'
+regexp: $path\.([^\.]+)\.([^\.]+)\.udp.udpoutdatagrams
+username: hosts
+options:
+  target: legendValue(aliasSub(aliasByNode(lowestCurrent(nonNegativeDerivative($path.$1.$2.udp.*),99),5),'udp',''),'avg')
+  title: 'UDP Stats on $2'
+  vtitle: 'datagrams'
+---
+path: tronchon.perl
+graphname: '$1.$2.~tcp_ret_rate'
+regexp: $path\.([^\.]+)\.([^\.]+)\.tcp.tcpretranssegs
+username: hosts
+options:
+  target: cactiStyle(alias(scale(divideSeries(nonNegativeDerivative($path.$1.$2.tcp.tcpretranssegs),nonNegativeDerivative($path.$1.$2.tcp.tcpoutsegs)),100),'Retransmission Rate'))
+  title: 'TCP Retransmission Rate on $2'
+  vtitle: 'percent'
+---
+path: tronchon.perl
+graphname: '$1.$2.~processes'
+regexp: $path\.([^\.]+)\.([^\.]+)\.system.hrsystemprocesses
+username: hosts
+options:
+  target: cactiStyle(alias($path.$1.$2.system.hrsystemprocesses,'Processes'))
+  title: 'Processes on $2'
+  vtitle: 'number'
+---
+path: tronchon.perl
+graphname: '$1.$2.~uptime'
+regexp: $path\.([^\.]+)\.([^\.]+)\.system.sysuptimeinstance
+username: hosts
+options:
+  target: legendValue(alias(scale($path.$1.$2.system.sysuptimeinstance, 0.00000011574074074074), 'Days UP'),'last')
+  title: 'Uptime on $2'
+  vtitle: 'days'
+---
+path: tronchon.perl
+graphname: '$1.$2.~io_raw'
+regexp: $path\.([^\.]+)\.([^\.]+)\.ioraw.ssioraw
+username: hosts
+options:
+  target: cactiStyle(alias(nonNegativeDerivative($path.$1.$2.ioraw.ssiorawreceived),'Raw IO Received'))
+  target1: cactiStyle(alias(scale(nonNegativeDerivative($path.$1.$2.ioraw.ssiorawsent),-1),'Raw IO sent'))
+  title: 'I/O Raw on $2'
+  vtitle: 'blocks sent / blocks received'
+---
+path: tronchon.perl
+graphname: '$1.$2.~load'
+regexp: $path\.([^\.]+)\.([^\.]+)\.load.load-1
+username: hosts
+options:
+  target: legendValue(legendValue(legendValue(aliasByNode(lowestCurrent(scale($path.$1.$2.load.*,0.01),9),5),'last'),'avg'),'max')
+  title: 'Load on $2'
+  vtitle: 'average processes'
+
+
+#path: collectd.windows
+#graphname: '$1.cpu.stacked'
+#regexp: collectd\.windows\.([^\.]+)\.cpu_0
+#username: windows
+#options:
+#  target: legendValue(aliasByNode(stacked(sortByMaxima($path.$1.cpu_[0-9]*)),3),'avg')
+#  title: 'Stacked CPU Usage On $1'
+#  vtitle: 'percent'
+#---
+#path: collectd.windows
+#graphname: '$1.cpu.combined'
+#regexp: collectd\.windows\.([^\.]+)\.cpu_0
+#username: windows
+#options:
+#  target: legendValue(aliasByNode(sortByMinima($path.$1.cpu_[0-9]*),3),'max')
+#  title: 'Combined CPU Usage On $1'
+#  vtitle: 'percent'
+#---
+#path: collectd.windows
+#graphname: '$1.mem.percent'
+#regexp: $path\.([^\.]+)\.disk_physical_memory_percent
+#username: windows
+#options:
+#  target: cactiStyle(aliasByNode($path.$1.disk_physical_memory_percent,3))
+#  target1: cactiStyle(aliasByNode($path.$1.disk_virtual_memory_percent,3))
+#  title: 'Memory Usage On $1'
+#  vtitle: 'percent'
+#---
+#path: collectd.windows
+#graphname: '$1.mem.physical'
+#regexp: $path\.([^\.]+)\.disk_physical_memory_used
+#username: windows
+#options:
+#  target: cactiStyle(aliasByNode($path.$1.disk_physical_memory_used,3))
+#  target1: cactiStyle(aliasByNode($path.$1.disk_physical_memory_size,3))
+#  title: 'Physical Memmory Usage On $1'
+#  vtitle: 'bytes'
+#---
+#path: collectd.windows
+#graphname: '$1.mem.virtual'
+#regexp: $path\.([^\.]+)\.disk_physical_memory_used
+#username: windows
+#options:
+#  target: cactiStyle(aliasByNode($path.$1.disk_virtual_memory_used,3))
+#  target1: cactiStyle(aliasByNode($path.$1.disk_virtual_memory_size,3))
+#  title: 'Virtual Memmory Usage On $1'
+#  vtitle: 'bytes'
+#---
+#path: collectd.windows
+#graphname: '$1.net.$2.bits'
+#regexp: $path\.([^\.]+)\.(nic\d+\_[\d\-]+)_ifentryinoctets
+#username: windows
+#options:
+#  target: aliasByNode(scaleToSeconds(nonNegativeDerivative($path.$1.$2_ifentryinoctets),8),3)
+#  target1: aliasByNode(scaleToSeconds(nonNegativeDerivative($path.$1.$2_ifentryoutoctets),-8),3)
+#  title: 'Network Usage On $1'
+#  vtitle: 'tx / rx (bps)'
+#---
+#path: collectd.windows
+#graphname: '$1.net.$2.errors'
+#regexp: $path\.([^\.]+)\.(nic\d+\_[\d\-]+)_ifentryinerrors
+#username: windows
+#options:
+#  target: aliasByNode(scaleToSeconds(nonNegativeDerivative($path.$1.$2_ifentryinerrors),1),3)
+#  target1: aliasByNode(scaleToSeconds(nonNegativeDerivative($path.$1.$2_ifentryouterrors),-1),3)
+#  title: 'Errors On $1'
+#  vtitle: 'errors'
+#---
+#path: collectd.windows
+#graphname: '$1.net.$2.discards'
+#regexp: $path\.([^\.]+)\.(nic\d+\_[\d\-]+)_ifentryindiscards
+#username: windows
+#options:
+#  target: aliasByNode(scaleToSeconds(nonNegativeDerivative($path.$1.$2_ifentryindiscards),1),3)
+#  target1: aliasByNode(scaleToSeconds(nonNegativeDerivative($path.$1.$2_ifentryoutdiscards),-1),3)
+#  title: 'Discards On $1'
+#  vtitle: 'discards'
+#---
+#path: collectd.windows
+#graphname: '$1.disk.$2.percent'
+#regexp: $path\.([^\.]+)\.(disk_\w_[\w_]+)_percent
+#username: windows
+#options:
+#  target: cactiStyle(aliasByNode($path.$1.$2_percent,3))
+#  title: 'Percent Disk Usage on $2'
+#  vtitle: 'percent'
+#---
+#path: collectd.windows
+#graphname: '$1.disk.$2.bytes'
+#regexp: $path\.([^\.]+)\.(disk_\w_[\w_]+)_size
+#username: windows
+#options:
+#  target: cactiStyle(aliasByNode($path.$1.$2_used,3))
+#  target1: cactiStyle(aliasByNode($path.$1.$2_size,3))
+#  title: 'Disk Usage on $2'
+#  vtitle: 'bytes'
+#---
+#path: collectd.windows
+#graphname: '$1.~citrix_sessions'
+#regexp: $path\.([^\.]+)\.citrix_sessions
+#username: windows
+#options:
+#  target: cactiStyle(aliasByNode($path.$1.citrix_sessions,3))
+#  title: 'Citrix Sessions On $1'
+#  vtitle: 'sessions'
+#---
+#path: collectd.windows
+#graphname: '$1.~processes'
+#regexp: $path\.([^\.]+)\.system_processes
+#username: windows
+#options:
+#  target: cactiStyle(aliasByNode($path.$1.system_processes,3))
+#  title: 'Total Running Processes On $1'
+#  vtitle: 'processes'
+#
